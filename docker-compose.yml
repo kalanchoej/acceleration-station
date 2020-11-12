@@ -1,9 +1,13 @@
 version: '3'
 
+networks:
+  home_networky:
 services:
   mosquitto:
-    image: eclipse-mosquitto:1.6.9
+    image: eclipse-mosquitto:1.6.12
     container_name: mosquitto
+    networks:
+      - home_networky
     ports:
       - 1883:1883
     volumes:
@@ -20,17 +24,21 @@ services:
       - 8086:8086
     volumes:
       - ${DATA_DIR}/influxdb:/var/lib/influxdb
+    networks:
+      - home_networky
     restart: always
 
   grafana:
-    image: grafana/grafana:6.7.3
+    image: grafana/grafana:latest
     container_name: grafana
     depends_on:
       - influxdb
     ports:
-      - 3000:3000
+      - 3001:3000
     volumes:
       - ${DATA_DIR}/grafana:/var/lib/grafana
+    networks:
+      - home_networky
     restart: always
 
   mqttbridge:
@@ -40,4 +48,6 @@ services:
     depends_on:
       - mosquitto
       - influxdb
+    networks:
+      - home_networky
     restart: always
